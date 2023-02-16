@@ -1,12 +1,16 @@
 package jdr;
 
+import Dungeon.Dungeon;
+import Dungeon.Chest;
+import Character.Hero;
+
 // a rendre le 28/02
 
 public class Game {
-	Donjon donjon;
+	Dungeon donjon;
 	Hero joueur;
 	
-	void ouvrirCoffre(Coffre coffre) {
+	void ouvrirCoffre(Chest coffre) {
 		if (coffre.getLoot().size() == 0) {
 			System.out.println("Ce coffre est vide.");
 			return;

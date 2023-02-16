@@ -1,15 +1,17 @@
-package jdr;
+package Character;
 
-public class Hero extends Personnage {
-	private Inventaire inventaire;
-	private int porter;
+import Item.Item;
+
+public class Hero extends Character{
+	private Inventory inventaire;
+	private int porte;
 	private int exp;
 	
 	public void prendreArme(Item item) {
 		inventaire.addItem(item);
 	}
 	
-	public Inventaire getInventaire() {return inventaire;}
+	public Inventory getInventaire() {return inventaire;}
 	
 	public void seDeplacer(char direction) {
 		switch (direction) {
@@ -28,4 +30,3 @@ public class Hero extends Personnage {
 		}
 	}
 }
-

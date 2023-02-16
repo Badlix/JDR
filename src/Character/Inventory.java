@@ -1,14 +1,16 @@
-package jdr;
+package Character;
 
 import java.util.List;
 
-public class Inventaire {
+import Item.Item;
+
+public class Inventory {
 	List<Item> armes;
 	List<Item> artefacts;
 	List<Item> potions;
 	
 	public void addItem(Item item) {
-		switch (item.type) {
+		switch (item.getType()) {
 		case "arme":
 			if (slotRempli(item) == false) armes.add(item);
 			break;
@@ -22,7 +24,7 @@ public class Inventaire {
 	}
 	
 	public boolean slotRempli(Item item) {
-		switch (item.type) {
+		switch (item.getType()) {
 		case "arme":
 			if (armes.size() >= 2) {
 				System.out.println("Votre inventaire d'arme est complet.");
@@ -42,5 +44,4 @@ public class Inventaire {
 		}
 		return false;
 	}
-		
 }

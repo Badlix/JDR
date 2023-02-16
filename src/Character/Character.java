@@ -1,19 +1,21 @@
-package jdr;
+package Character;
 
-public class Personnage {
+import Dungeon.Dungeon;
+
+public class Character {
 	private String nom;
-	private Donjon map;
+	private Dungeon map;
 	protected Position pos;
 	private int pv;
 	private int atq;
 	private int def;
 	private int velocite;
 	
-	public Donjon getMap() {return map;}
+	public Dungeon getMap() {return map;}
 	
 	public Position getPosition() {return pos;}
 	
-	public void attaquer(Personnage cible) {
+	public void attaquer(Character cible) {
 		System.out.println(nom + " attaque.");
 		cible.prendreDegat(atq);
 	}

@@ -1,8 +1,10 @@
 package jdr;
 
+import Character.Character;
+
 public class Combat {
-	private Personnage perso1;
-	private Personnage monstre;
+	private Character perso1;
+	private Character monstre;
 	private boolean tourDePerso1;
 	
 	private void changerTour() {
@@ -14,11 +16,12 @@ public class Combat {
 		else tourDePerso1 = false;
 	}
 	
-	public Combat(Personnage perso1, Personnage monstre) {
+	public Combat(Character perso1, Character monstre) {
 		this.perso1 = perso1;
 		this.monstre = monstre;
 		definirPremierQuiJoue();
 		while (!perso1.estMort() || !monstre.estMort()) {
+			// prendre potions
 			if (tourDePerso1) perso1.attaquer(monstre);
 			else monstre.attaquer(perso1);
 			changerTour();

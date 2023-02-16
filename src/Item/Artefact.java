@@ -1,4 +1,4 @@
-package jdr;
+package Item;
 
 public class Artefact extends Item {
 	private int pv;

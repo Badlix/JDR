@@ -1,4 +1,4 @@
-package jdr;
+package Character;
 
 public class Position {
 	private int x;

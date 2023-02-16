@@ -1,10 +1,15 @@
-package jdr;
+package Dungeon;
+
 import java.util.List;
 
-public class Donjon {
+import Character.Monster;
+import Dungeon.Chest;
+import Character.Position;
+
+public class Dungeon {
 	int [][] map;
-	List<Monstre> monstres;
-	List<Coffre> coffres;
+	List<Monster> monstres;
+	List<Chest> coffres;
 	
 	// 0 = mur et 1 = espace
 	public boolean caseAtteignable(int x, int y) {
@@ -16,17 +21,16 @@ public class Donjon {
 	}
 	
 	public boolean coffreIci(Position pos) {
-		for (Coffre coffre : coffres) {
+		for (Chest coffre : coffres) {
 			if (coffre.getPos() == pos) return true;
 		}
 		return false;
 	}
 	
 	public boolean monstreIci(Position pos) {
-		for (Monstre monstre : monstres) {
-			if (monstre.pos == pos) return true;
+		for (Monster monstre : monstres) {
+			if (monstre.getPosition() == pos) return true;
 		}
 		return false;
 	}
-	
 }

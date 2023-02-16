@@ -1,8 +1,10 @@
-package jdr;
+package Dungeon;
 
 import java.util.List;
+import Character.Position;
+import Item.Item;
 
-public class Coffre {
+public class Chest {
 	private Position pos;
 	private List<Item> loot; // max size = 1
 	
