@@ -8,8 +8,10 @@ import Item.Artefact;
 public class Hero extends Character{
 	private Inventory inventaire;
 	
-	public Hero(String nom, Position pos, Inventory inventaire) {
-		super(nom, pos);
+	public Hero(String nom, Position pos, Inventory inventaire, int attaque, int pointDeVieMax, int defense, int velocite, int chanceCritique, int chanceEsquive) {
+		super(nom, pos, attaque, pointDeVieMax, defense, velocite, chanceCritique, chanceEsquive);
+		super.stat.put("mana", 40);
+		super.stat.put("manamax", 40);
 		this.inventaire = inventaire;
 	}
 	

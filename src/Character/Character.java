@@ -1,11 +1,14 @@
 package Character;
 
 import java.util.Random;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Character {
 	private String nom;
 	protected Position pos;
+	protected Map<String, Integer> stat = new HashMap<>(); 
 	protected int attaque;
 	protected int pointDeVie;
 	protected int poitDeVieMax;
@@ -16,9 +19,24 @@ public class Character {
 	protected int pointCompetence;
 	protected int pointCompetenceMax;
 	
-	public Character(String nom, Position pos) {
+	public Character(String nom, Position pos, int attaque, int pointDeVieMax, int defense, int velocite, int chanceCritique, int chanceEsquive) {
+		stat.put("atq", attaque);
+		stat.put("pv", pointDeVieMax);
+		stat.put("pvmax", pointDeVieMax);
+		stat.put("def", defense);
+		stat.put("velocite", velocite);
+		stat.put("critique",chanceCritique);
+		stat.put("esquive", chanceEsquive);
 		this.nom = nom;
 		this.pos = pos;
+	}
+	
+	public Map<String, Integer> getAllStat() {return stat;}
+	
+	public Integer getStat(String nomDuStat) {
+		if (stat.containsKey(nomDuStat)) return stat.get(nomDuStat);
+		System.out.print("ERREUR DE CLÉ");
+		return null;
 	}
 	
 	protected int critiquePossibility(int degat) {
