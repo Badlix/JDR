@@ -1,14 +1,73 @@
 package Character;
 
 import Item.Item;
+import Item.Potion;
+import Item.Weapon;
+import Item.Artefact;
 
 public class Hero extends Character{
 	private Inventory inventaire;
-	private int porte;
-	private int exp;
 	
-	public void prendreArme(Item item) {
+	public Hero(String nom, Position pos, Inventory inventaire) {
+		super(nom, pos);
+		this.inventaire = inventaire;
+	}
+	
+	public int getAttaque() {
+		if (inventaire.getEquipWeapon() != null) {
+			return super.attaque + inventaire.getEquipWeapon().getStat1();
+		}
+		return super.attaque;
+	}
+	
+	public int getPV() {
+		if (inventaire.getEquipWeapon() != null) {
+			return super.pointDeVie + inventaire.getEquipArtefact().getStat1();
+		}
+		return super.pointDeVie;
+	}
+	
+	public int getChanceCritique() {
+		if (inventaire.getEquipWeapon() != null) {
+			return super.chanceCritique + inventaire.getEquipWeapon().getStat2();
+		}
+		return super.chanceCritique;
+	}
+	
+	public int getDef() {
+		if (inventaire.getEquipArtefact() != null) {
+			return super.defense + inventaire.getEquipArtefact().getStat2();
+		}
+		return super.defense;
+	}
+	
+	public Weapon getWeapon() {
+		return inventaire.getEquipWeapon();
+	}
+	
+	public Artefact getArtefact() {
+		return inventaire.getEquipArtefact();
+	}
+	
+	public void equiperItem(Item item) {
+		if (item == inventaire.getEquipWeapon() || item == inventaire.getEquipArtefact()) {
+			System.out.print("Cet objet est déjà équipé.");
+			return;
+		}
+		inventaire.equiper(item);
+	}
+	
+	public void regarderInventaire() {
+		inventaire.show();
+	}
+	
+	public void prendreItem(Item item) {
 		inventaire.addItem(item);
+	}
+	
+	public void jeterItem(Item item) {
+		inventaire.removeItem(item);
+		System.out.print("Vous avez jeté " + item.getNom());
 	}
 	
 	public Inventory getInventaire() {return inventaire;}
@@ -16,17 +75,18 @@ public class Hero extends Character{
 	public void seDeplacer(char direction) {
 		switch (direction) {
 			case 'z':
-				if (getMap().caseAtteignable(pos.getX(), pos.getY()-1)) pos.addY(-1);
+				pos.addY(-1);
 				break;
 			case 'd':
-				if (getMap().caseAtteignable(pos.getX()+1, pos.getY())) pos.addX(1);
+				pos.addX(1);
 				break;
 			case 's':
-				if (getMap().caseAtteignable(pos.getX(), pos.getY()+1)) pos.addY(1);
+				pos.addY(1);
 				break;
 			case 'q':
-				if (getMap().caseAtteignable(pos.getX()-1, pos.getY()+1)) pos.addX(-1);
+				pos.addX(-1);
 				break;
 		}
 	}
+	
 }
