@@ -1,8 +1,10 @@
 package Item;
 
+import java.util.List;
+
 public class Weapon extends Item {
 
-	public Weapon(String name, int degat, int chanceCritique) {
-		super(name, degat, chanceCritique);
+	public Weapon(String name, List<String> statName, List<Integer> statValue) {
+		super(name, statName, statValue);
 	}
 }

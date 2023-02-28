@@ -3,78 +3,102 @@ package Character;
 import Item.Item;
 import Item.Potion;
 import Item.Weapon;
+
+import java.util.Map;
+import java.util.Scanner;
+
 import Item.Artefact;
 
 public class Hero extends Character{
-	private Inventory inventaire;
+	private Inventory inventory;
+	private int exp; 
 	
-	public Hero(String nom, Position pos, Inventory inventaire, int attaque, int pointDeVieMax, int defense, int velocite, int chanceCritique, int chanceEsquive) {
-		super(nom, pos, attaque, pointDeVieMax, defense, velocite, chanceCritique, chanceEsquive);
-		super.stat.put("mana", 40);
-		super.stat.put("manamax", 40);
-		this.inventaire = inventaire;
+	public Hero(String name, Position pos, Inventory inventory, int attaque, int pointDeVieMax, int defense, int velocite, int chanceCritique, int chanceEsquive, int mana) {
+		super(name, pos, 1, attaque, pointDeVieMax, defense, velocite, chanceCritique, chanceEsquive);
+		super.stat.put("mana", mana);
+		super.stat.put("manamax", mana);
+		this.inventory = inventory;
+		this.exp = 0;
 	}
 	
-	public int getAttaque() {
-		if (inventaire.getEquipWeapon() != null) {
-			return super.attaque + inventaire.getEquipWeapon().getStat1();
+	// return l'arme équipé
+	public Weapon getWeapon() {return inventory.getEquipWeapon();}
+	
+	// return l'artefact équipé
+	public Artefact getArtefact() {return inventory.getEquipArtefact();}
+	
+	public Inventory getInventory() {return inventory;}
+	
+	public int getExp() {return exp;}
+	
+	public void gainExp(int quantite) {
+		exp += quantite;
+		while (level*10 <= exp && level < 50) {
+			exp -= level*10;
+			levelUp();
 		}
-		return super.attaque;
 	}
 	
-	public int getPV() {
-		if (inventaire.getEquipWeapon() != null) {
-			return super.pointDeVie + inventaire.getEquipArtefact().getStat1();
+	public void levelUp() {
+		setStat("atq", getStat("atq") + 10);
+		setStat("pv", getStat("pv") + 20);
+		setStat("pvmax", getStat("pvmax") + 20);
+		setStat("def", getStat("def") + 10);
+		++level;
+		System.out.println("Vous êtes passé au niveau " + level);
+	}
+	
+	public void desequipItem(Item item) {
+		if (item == inventory.getEquipWeapon() || item == inventory.getEquipArtefact()) {
+			for (int i = 0; i < item.getStatNames().size(); i++) {
+				setStat(item.getStatNames().get(i), getStat(item.getStatNames().get(i)) - item.getStatValues().get(i));
+			}
 		}
-		return super.pointDeVie;
 	}
 	
-	public int getChanceCritique() {
-		if (inventaire.getEquipWeapon() != null) {
-			return super.chanceCritique + inventaire.getEquipWeapon().getStat2();
-		}
-		return super.chanceCritique;
-	}
-	
-	public int getDef() {
-		if (inventaire.getEquipArtefact() != null) {
-			return super.defense + inventaire.getEquipArtefact().getStat2();
-		}
-		return super.defense;
-	}
-	
-	public Weapon getWeapon() {
-		return inventaire.getEquipWeapon();
-	}
-	
-	public Artefact getArtefact() {
-		return inventaire.getEquipArtefact();
-	}
-	
-	public void equiperItem(Item item) {
-		if (item == inventaire.getEquipWeapon() || item == inventaire.getEquipArtefact()) {
+	public void equipItem(Item item) {
+		if (item == inventory.getEquipWeapon() || item == inventory.getEquipArtefact()) {
 			System.out.print("Cet objet est déjà équipé.");
 			return;
 		}
-		inventaire.equiper(item);
+		if (item.getClass() == Weapon.class && inventory.getEquipWeapon() != null) desequipItem(inventory.getEquipWeapon());
+		else if (item.getClass() == Artefact.class && inventory.getEquipArtefact() != null) desequipItem(inventory.getEquipArtefact());
+		for (int i = 0; i < item.getStatNames().size(); i++) {
+			setStat(item.getStatNames().get(i), getStat(item.getStatNames().get(i)) + item.getStatValues().get(i));
+			if (item.getStatNames().get(i) == "pv" || item.getStatNames().get(i) == "mana") {
+				setStat(item.getStatNames().get(i) + "max", getStat(item.getStatNames().get(i) + "max") + item.getStatValues().get(i));
+			}
+		}
+		inventory.equip(item);
 	}
 	
-	public void regarderInventaire() {
-		inventaire.show();
+	public void showInventory() {
+		inventory.show();
 	}
 	
-	public void prendreItem(Item item) {
-		inventaire.addItem(item);
+	public void takeItem(Item item) {
+		inventory.addItem(item);
 	}
 	
-	public void jeterItem(Item item) {
-		inventaire.removeItem(item);
-		System.out.print("Vous avez jeté " + item.getNom());
+	public void throwItem(Item item) {
+		desequipItem(item);
+		inventory.removeItem(item);
+		System.out.print("Vous avez jeté " + item.getName());
 	}
 	
-	public Inventory getInventaire() {return inventaire;}
-	
-	public void seDeplacer(char direction) {
+	protected void usePotion(Scanner scan) {
+		System.out.print("Quelle potion voulez vous use ? : ");
+		String itemName = scan.nextLine();
+		for (Potion potion : getInventory().getPotions()) {
+			if (itemName.contains(potion.getName())) {
+				potion.use(this);
+				getInventory().removeItem(potion);
+				return;
+			}
+		}
+	}
+		
+	public void move(char direction) {
 		switch (direction) {
 			case 'z':
 				pos.addY(-1);

@@ -1,20 +1,22 @@
 package Item;
 
+import java.util.List;
+
 public class Item {
 	private String nom;
-	protected int stat1;
-	protected int stat2;
+	protected List<String> statNames;
+	protected List<Integer> statValues;
 	
-	public Item(String nom, int stat1, int stat2) {
+	public Item(String nom, List<String> statNames, List<Integer> statValues) {
 		this.nom = nom;
-		this.stat1 = stat1;
-		this.stat2 = stat2;
+		this.statNames = statNames;
+		this.statValues = statValues;
 	}
 	
-	public String getNom() {return nom;}
+	public List<String> getStatNames() {return statNames;}
 	
-	public int getStat1() {return stat1;}
+	public List<Integer> getStatValues() {return statValues;}
 	
-	public int getStat2() {return stat2;}	
-	
+	public String getName() {return nom;}
+		
 }

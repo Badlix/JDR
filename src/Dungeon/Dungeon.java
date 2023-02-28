@@ -27,9 +27,13 @@ public class Dungeon {
 		return spawn;
 	}
 	
+	public void removeMonster(Monster monstre) {
+		monstres.remove(monstre);
+	}
+	
 	public Monster isThereAMonster(Position pos) {
 		for (Monster monstre : monstres) {
-			if (monstre.getPosition() == pos) return monstre;
+			if (monstre.getPosition().getX() == pos.getX() && monstre.getPosition().getY() == pos.getY()) return monstre;
 		}
 		return null;
 	}
@@ -51,7 +55,6 @@ public class Dungeon {
 			System.out.println("Cette case n'est pas accessible.");
 			return false;
 		}
-		System.out.println("Deplacement reussi.");
 		return true;
 	}
 }

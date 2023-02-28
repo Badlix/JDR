@@ -1,36 +1,60 @@
 package jdr;
 
+import java.util.Scanner;
+
 import Character.Character;
+import Character.Hero;
+import Character.Monster;
 
 public class Combat {
-	private Character joueur;
-	private Character monstre;
-	private boolean tourDuJoueur;
+	private Hero player;
+	private Monster monster;
+	private boolean isPlayerTurn;
 	
-	public Combat(Character joueur, Character monstre) {
-		this.joueur = joueur;
-		this.monstre = monstre;
+	public Combat(Scanner scan, Hero player, Monster monster) {
+		this.player = player;
+		this.monster = monster;
+		definirPremierQuiJoue();
+		while (!player.isDead() && !monster.isDead()) {
+//			System.out.print("\033\143");
+//			System.out.print("\033[H\033[2J");
+//			System.out.flush();
+			show();
+			if (isPlayerTurn) {
+				monster.takeDamage(player.attaque(scan, monster));
+			} else {
+				player.takeDamage(monster.attaque(scan, monster));
+			}
+			changeTurn();
+		}
+		if (monster.isDead()) {
+			drawDelimitater();
+			System.out.println("Vous avez vaincu " + monster.getName());
+			player.gainExp(monster.getLevel()*10);
+		}
 	}
 	
-	private void changerTour() {
-		tourDuJoueur = !tourDuJoueur;
+	private void changeTurn() {
+		isPlayerTurn = !isPlayerTurn;
 	}
 	
-//	private void definirPremierQuiJoue() {
-//		if (perso1.getVelocite() >= perso1.getVelocite()) tourDePerso1 = true;
-//		else tourDePerso1 = false;
-//	}
+	private void definirPremierQuiJoue() {
+		if (player.getStat("velocite") >= monster.getStat("velocite")) isPlayerTurn = true;
+		else isPlayerTurn = false;
+	}
 	
-//	public Combat(Character perso1, Character monstre) {
-//		this.perso1 = perso1;
-//		this.monstre = monstre;
-//		definirPremierQuiJoue();
-//		while (!perso1.estMort() || !monstre.estMort()) {
-//			// prendre potions
-//			if (tourDePerso1) perso1.attaquer(monstre);
-//			else monstre.attaquer(perso1);
-//			changerTour();
-//		}
-//		
-//	}
+	private void show() {
+		drawDelimitater();
+		System.out.println(player.getName() + "               " + monster.getName());
+		System.out.println("PV : " + player.getStat("pv") + "               " + monster.getStat("pv"));
+		drawDelimitater();
+	}
+	
+	public void drawDelimitater() {;
+	for (int i = 0; i < 50; i++) {
+		System.out.print("-");
+	}
+	System.out.print("\n");
+}
+	
 }

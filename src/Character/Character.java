@@ -6,20 +6,16 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class Character {
-	private String nom;
+	private String name;
 	protected Position pos;
-	protected Map<String, Integer> stat = new HashMap<>(); 
-	protected int attaque;
-	protected int pointDeVie;
-	protected int poitDeVieMax;
-	protected int defense;
-	protected int velocite;
-	protected int chanceCritique; // (%) entre 0 et 100 -> multiplie dégat par 1,5 
-	protected int chanceEsquive; // (%) entre 0 et 100
-	protected int pointCompetence;
-	protected int pointCompetenceMax;
+	protected Map<String, Integer> stat; 
+	protected int level;
 	
-	public Character(String nom, Position pos, int attaque, int pointDeVieMax, int defense, int velocite, int chanceCritique, int chanceEsquive) {
+	public Character(String name, Position pos, int level, int attaque, int pointDeVieMax, int defense, int velocite, int chanceCritique, int chanceEsquive) {
+		this.name = name;
+		this.pos = pos;
+		this.level = level;
+		stat = new HashMap<>();
 		stat.put("atq", attaque);
 		stat.put("pv", pointDeVieMax);
 		stat.put("pvmax", pointDeVieMax);
@@ -27,68 +23,87 @@ public class Character {
 		stat.put("velocite", velocite);
 		stat.put("critique",chanceCritique);
 		stat.put("esquive", chanceEsquive);
-		this.nom = nom;
-		this.pos = pos;
 	}
+	
+	public String getName() {return name;}
+	
+	public Position getPosition() {return pos;}
+	
+	public int getLevel() {return level;}
 	
 	public Map<String, Integer> getAllStat() {return stat;}
 	
-	public Integer getStat(String nomDuStat) {
-		if (stat.containsKey(nomDuStat)) return stat.get(nomDuStat);
-		System.out.print("ERREUR DE CLÉ");
+	public Integer getStat(String statName) {
+		if (stat.containsKey(statName)) return stat.get(statName);
+		System.out.println("\nERREUR DE CLÉ (get) -> " + statName);
 		return null;
+	}
+	
+	public void setStat(String statName, Integer value) {
+		if (stat.containsKey(statName)) {
+			stat.put(statName, value);
+			return;
+		}
+		System.out.print("ERREUR DE CLÉ (set) -> " + statName);
+	}
+	
+	public void recuperePV(int value) {
+		if (value < 0) value = 0;
+		if (getStat("pv") + value > getStat("pvmax")) {
+			value = getStat("pvmax") - getStat("pv");
+		}
+		setStat("pv", getStat("pv") + value);
+		System.out.println("Vous avez récupéré " + value + " pv.");
+	}
+	
+	public void recupereMana(int value) {
+		if (value < 0) value = 0;
+		if (getStat("mana") + value > getStat("manamax")) {
+			value = getStat("manamax") - getStat("mana");
+		}
+		setStat("mana", getStat("mana") + value);
+		System.out.println("Vous avez récupéré " + value + " mana.");
 	}
 	
 	protected int critiquePossibility(int degat) {
 		Random random = new Random();
-		if (random.nextInt(100) < chanceCritique) {
-			System.out.print(nom + " inflige un coup critique.");
+		if (random.nextInt(100) < getStat("critique")) {
+			System.out.println(name + " inflige un coup critique.");
 			return (int)(degat * 1.5);
 		}
 		return degat;
 	}
 	
-	public String getNom() {return nom;}
-	
-	public Position getPosition() {return pos;}
-	
-	public int getAttaque() {
-		return attaque;
+	public void showStat() {
+		System.out.println("ATQ : " + getStat("atq"));
+		System.out.println("PV : " + getStat("pv") + "/" + getStat("pvmax"));
+		System.out.println("DEF : " + getStat("def"));
+		System.out.println("VELOCITE : " + getStat("velocite"));
+		System.out.println("CHANCE CRITIQUE : " + getStat("critique"));
+		System.out.println("CHANCE ESQUIVE : " + getStat("esquive"));
+		System.out.println("MANA : " + getStat("mana") + "/" + getStat("manamax"));
 	}
-	
-	public int getPV() {
-		return pointDeVie;
-	}
-	
-	public int getChanceCritique() {
-		return chanceCritique;
-	}
-	
-	public int getDef() {
-		return defense;
-	}
-	
-	public int getVelocite() {return velocite;}
-	
-	public int getCurrentPointCompetence() {return pointCompetence;}
-	
-	public void prendreDegat(int degat) {
+		
+	public void takeDamage(int damage) {
 		Random random = new Random();
-		if (random.nextInt(100) < chanceEsquive) {
-			System.out.print(nom + " a esquivé.");
+		if (random.nextInt(100) < getStat("esquive")) {
+			System.out.println(name + " a esquivé.");
+			return;
 		}
-		int nbDegatPerdu = getDef() - degat;
+		int nbDegatPerdu = damage - getStat("def");
 		if (nbDegatPerdu < 0) nbDegatPerdu = 0;
-		System.out.println(nom + " a perdu " + nbDegatPerdu + " points de vie.");
+		setStat("pv", getStat("pv") - nbDegatPerdu);
+		System.out.println(" " + name + " a perdu " + nbDegatPerdu + " points de vie.");
 	}
 	
-	public boolean estMort() {
-		if (getPV() <= 0) return true;
+	public boolean isDead() {
+		if (getStat("pv") <= 0) return true;
 		return false;
 	}
 	
-	public int attaque(Scanner scan) {
-		return critiquePossibility(getAttaque());
+	public int attaque(Scanner scan, Monster monstre) {
+		System.out.print(name + " attaque. ");
+		return critiquePossibility(getStat("atq"));
 	}
-
+	
 }

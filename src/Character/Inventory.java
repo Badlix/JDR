@@ -7,21 +7,20 @@ import Item.Item;
 import Item.Potion;
 
 public class Inventory {
-	private List<Weapon> armes;
+	private List<Weapon> weapons;
 	private List<Artefact> artefacts;
 	private List<Potion> potions;
-	private Weapon armeEquiper;
-	private Artefact artefactEquiper;
+	private Weapon equipWeapon = null;
+	private Artefact equipArtefact = null;
 	
-	public Inventory(List<Weapon> armes, List<Artefact> artefacts, List<Potion> potions) {
-		this.armes = armes;
+	public Inventory(List<Weapon> weapons, List<Artefact> artefacts, List<Potion> potions) {
+		this.weapons = weapons;
 		this.artefacts = artefacts;
 		this.potions = potions;
-		this.armeEquiper = armes.get(0); 
 	}
 	
 	public List<Weapon> getWeapons() {
-		return armes;
+		return weapons;
 	}
 	
 	public List<Artefact> getArtefacts() {
@@ -32,60 +31,61 @@ public class Inventory {
 		return potions;
 	}
 	
-	public Weapon getEquipWeapon() {return armeEquiper;}
+	public Weapon getEquipWeapon() {return equipWeapon;}
 	
-	public Artefact getEquipArtefact() {return artefactEquiper;}
+	public Artefact getEquipArtefact() {return equipArtefact;}
 	
-	public void equiper(Item item) {
+	public void equip(Item item) {
 		if (item.getClass() == Weapon.class) {
-			armeEquiper = (Weapon) item;
-			System.out.print("Vous avez équipé " + item.getNom());
+			equipWeapon = (Weapon) item;
+			System.out.println("Vous avez équipé " + item.getName());
 			return;
 		}
 		if (item.getClass() == Artefact.class) {
-			artefactEquiper = (Artefact) item;
-			System.out.print("Vous avez équipé " + item.getNom());
+			equipArtefact = (Artefact) item;
+			System.out.println("Vous avez équipé " + item.getName());
 			return;
 		}
-		System.out.print("Vous ne pouvez pas équiper cet objet.");
+		System.out.println("Vous ne pouvez pas équiper cet objet.");
 	}
 	
 	public void show() {
-		System.out.print("Votre inventaire contient : ");
-		System.out.print("\narmes (" + armes.size() + ") :");
-		for (Weapon arme : armes) {
-			System.out.print("\n   - " + arme.getNom() + " : +" + arme.getStat1() + " degat | +" + arme.getStat2() + "% de coup critique");
-			if (arme == armeEquiper) System.out.print(" (équipé)");
+		System.out.println("Votre inventaire contient : ");
+		System.out.print("weapons (" + weapons.size() + ") :");
+		for (Weapon arme : weapons) {
+			System.out.print("\n   - " + arme.getName() + " : ");
+			if (arme == equipWeapon) System.out.print(" (équipé)");
 		}
 		System.out.print("\nartefacts (" + artefacts.size() + "):");
 		for (Artefact artefact : artefacts) {
-			System.out.print("\n   - " + artefact.getNom() + " : +" + artefact.getStat1() + " pv | +" + artefact.getStat2() + " def");
+			System.out.print("\n   - " + artefact.getName() + " : " );
 		}
 		System.out.print("\npotions (" + potions.size() + "):");
 		for (Potion potion : potions) {
-			System.out.println("\n   - " + potion.getNom());
+			System.out.print("\n   - " + potion.getName());
 		}
+		System.out.print("\n");
 	}
 	
 	public void addItem(Item item) {
 		if (item.getClass() == Weapon.class) {	
-			if (slotRempli(item) == false) {
-				armes.add((Weapon) item);
-				System.out.print("Vous avez récupéré " + item.getNom());
+			if (isSlotFull(item) == false) {
+				weapons.add((Weapon) item);
+				System.out.println("Vous avez récupéré " + item.getName());
 			} else {
 				System.out.println("Votre inventaire d'arme est complet.");
 			}
 		} else if (item.getClass() == Artefact.class) {
-			if (slotRempli(item) == false) {
+			if (isSlotFull(item) == false) {
 				artefacts.add((Artefact) item);
-				System.out.print("Vous avez récupéré " + item.getNom());
+				System.out.println("Vous avez récupéré " + item.getName());
 			} else {
 				System.out.println("Votre inventaire d'artefact est complet.");
 			}
-		} else {
-			if (slotRempli(item) == false) {
+		} else if (item.getClass() == Potion.class){
+			if (isSlotFull(item) == false) {
 				potions.add((Potion) item);
-				System.out.print("Vous avez récupéré " + item.getNom());
+				System.out.println("Vous avez récupéré " + item.getName());
 			} else {
 				System.out.println("Votre inventaire de potion est complet.");
 			}
@@ -94,19 +94,19 @@ public class Inventory {
 	
 	public void removeItem(Item item) {
 		if (item.getClass() == Weapon.class) {
-			armes.remove(item);
-			if (armeEquiper == item) armeEquiper = null;
+			weapons.remove(item);
+			if (equipWeapon == item) equipWeapon = null;
 		}
 		else if (item.getClass() == Artefact.class) {
 			artefacts.remove(item);
-			if (artefactEquiper == item) artefactEquiper = null;
+			if (equipArtefact == item) equipArtefact = null;
 		}
 		else if (item.getClass() == Potion.class) potions.remove(item);
 	}
 	
-	public boolean slotRempli(Item item) {
+	public boolean isSlotFull(Item item) {
 		if (item.getClass() == Weapon.class) {
-			if (armes.size() >= 2) {
+			if (weapons.size() >= 2) {
 				return true;
 			}
 		} else if (item.getClass() == Artefact.class) {

@@ -16,15 +16,15 @@ public class Chest {
 	public Position getPos() {return pos;}
 	
 	public Item getLoot() {
-		if (loot.size() != 0) {
+		if (loot != null && loot.size() != 0) {
 			return loot.get(0);
 		}
-		System.out.print("Ce coffre est vide.");
+		System.out.println("Ce coffre est vide.");
 		return null;
 	}
 	
 	public void vider() {
-		loot.clear();
+		loot = List.of();
 	}
 	
 	public Position getPosition() {return pos;}
@@ -34,11 +34,11 @@ public class Chest {
 			System.out.println("Ce coffre est vide.");
 			return;
 		}
-		if (joueur.getInventaire().slotRempli(getLoot()) == false) {
+		if (joueur.getInventory().isSlotFull(getLoot()) == false) {
 			vider();
-			joueur.getInventaire().addItem(getLoot());
+			joueur.getInventory().addItem(getLoot());
 			return;
 		}
-		joueur.getInventaire().addItem(getLoot());
+		joueur.getInventory().addItem(getLoot());
 	}
 }

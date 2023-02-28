@@ -15,138 +15,179 @@ import Character.Position;
 // a rendre le 28/02
 
 public class Game {
-	static Dungeon donjon;
-	static Hero joueur;
+	static Dungeon dungeon;
+	static Hero player;
 	
-	Game(Dungeon donjon, Hero joueur) {
-		Game.donjon = donjon;
-		Game.joueur = joueur;
+	Game(Dungeon dungeon, Hero player) {
+		Game.dungeon = dungeon;
+		Game.player = player;
 	}
 	
 	public void main(String[] args) {
 		Scanner scan = new Scanner(System.in);
-		boolean finDuJeu = false;
-		while (!finDuJeu) {
+		boolean gameEnd = false;
+		while (!gameEnd) {
 			showMap();
-			System.out.print("\nQuel action voulez vous faire ? (bouger, inventaire, ouvrir coffre) : ");
+			System.out.print("Quel action voulez vous faire ? (bouger, voir inventaire, voir stat, ouvrir coffre) : ");
 			switch (scan.nextLine()) {
 			case "bouger":
-				seDeplacer(scan);
+				move(scan);
+				if (dungeon.isThereAMonster(player.getPosition()) != null) {
+					System.out.println("Un combat vient de se déclencher.");
+					new Combat(scan, player, dungeon.isThereAMonster(player.getPosition()));
+					if (dungeon.isThereAMonster(player.getPosition()).isDead()) {
+						dungeon.removeMonster(dungeon.isThereAMonster(player.getPosition()));
+					}
+				}
 				break;
-			case "inventaire":
-				regarderInventaire(scan);
+			case "voir inventaire":
+				regarderInventory(scan);
+				break;
+			case "voir stat":
+				drawDelimitater();
+				player.showStat();
 				break;
 			case "ouvrir coffre":
-				ouvrirCoffre(scan, donjon.isThereAChest(joueur.getPosition()));
+				openCoffre(scan, dungeon.isThereAChest(player.getPosition()));
 				break;
 			case "":
-				finDuJeu = true;
+				gameEnd = true;
 				break;
+			}
+			if (player.isDead()) {
+				System.out.println("Vous êtes mort...");
+				gameEnd = true;
 			}
 		}
 	}
 	
-	public void regarderInventaire(Scanner scan) {
-		joueur.regarderInventaire();
-		System.out.print("Quelle action voulez vous faire ? (equiper, jeter ou rien) : ");
+	public void regarderInventory(Scanner scan) {
+		drawDelimitater();
+		player.showInventory();
+		drawDelimitater();
+		System.out.print("Quelle action voulez vous faire ? (equiper, jeter , utiliser ou rien) : ");
 		switch(scan.nextLine()) {
 			case "equiper":
 				equiper(scan);
 				break;
 			case "jeter":
-				jeter(scan);
+				throwItem(scan);
+				break;
+			case "utiliser":
+				usePotion(scan);
 				break;
 		}
 	}
 	
-	public void ouvrirCoffre(Scanner scan, Chest chest) {
+	public void openCoffre(Scanner scan, Chest chest) {
 		if (chest != null) {
 			if (chest.getLoot() != null) {
-				joueur.prendreItem(chest.getLoot());
+				player.takeItem(chest.getLoot());
 				chest.vider();
 			}
 		} else {
-			System.out.print("Il n'y a pas de coffre dans les environs.");
+			System.out.println("Il n'y a pas de coffre dans les environs.");
 		}
 	}
 	
 	public void showMap() {
-		for (int y = 0; y < donjon.getMap().length; y++) {
-			System.out.print("\n");
-			for (int x = 0; x < donjon.getMap()[0].length; x++) {
-				if (x == joueur.getPosition().getX() && y == joueur.getPosition().getY()) {
-					System.out.print("x");
-				} else if (donjon.isThereAMonster(new Position(x, y)) != null) {
-					System.out.print("o");
-				} else if (donjon.isThereAChest(new Position(x, y)) != null) {
-					System.out.print("c");
-				} else if (donjon.getMap()[y][x] == 1){
-					System.out.print('#');
+		drawDelimitater();
+		for (int y = 0; y < dungeon.getMap().length; y++) {
+			for (int x = 0; x < dungeon.getMap()[0].length; x++) {
+				if (x == player.getPosition().getX() && y == player.getPosition().getY()) {
+					System.out.print("x ");
+				} else if (dungeon.isThereAMonster(new Position(x, y)) != null) {
+					System.out.print("! ");
+				} else if (dungeon.isThereAChest(new Position(x, y)) != null) {
+					System.out.print("? ");
+				} else if (dungeon.getMap()[y][x] == 1){
+					System.out.print("# ");
 				} else {
-					System.out.print(' ');
+					System.out.print(". ");
 				}
 			}
+			System.out.print("\n");
 		}
+		drawDelimitater();
 	}
 	
-	static void jeter(Scanner scan) {
-		System.out.print("\nQuel objet voulez vous jeter ? (l'objet ne pourra pas être récupéré) : ");
+	static void throwItem(Scanner scan) {
+		System.out.print("Quel objet voulez vous jeter ? (l'objet ne pourra pas être récupéré) : ");
 		String itemName = scan.nextLine();
-		for (Weapon weapon : joueur.getInventaire().getWeapons()) {
-			if (itemName.contains(weapon.getNom())) {
-				joueur.jeterItem(weapon);
+		for (Weapon weapon : player.getInventory().getWeapons()) {
+			if (itemName.contains(weapon.getName())) {
+				player.throwItem(weapon);
 				return;
 			}
 		}
-		for (Artefact artefact : joueur.getInventaire().getArtefacts()) {
-			if (itemName.contains(artefact.getNom())) {
-				joueur.jeterItem(artefact);
+		for (Artefact artefact : player.getInventory().getArtefacts()) {
+			if (itemName.contains(artefact.getName())) {
+				player.throwItem(artefact);
 				return;
 			}
 		}
-		for (Potion potion : joueur.getInventaire().getPotions()) {
-			if (itemName.contains(potion.getNom())) {
-				joueur.jeterItem(potion);
+		for (Potion potion : player.getInventory().getPotions()) {
+			if (itemName.contains(potion.getName())) {
+				player.throwItem(potion);
 				return;
 			}
 		}
-		System.out.print("\nVous ne possedait pas cet objet.");
+		System.out.println("Vous ne possedait pas cet objet.");
 	}
 	
 	static void equiper(Scanner scan) {
-		System.out.print("\nQuel objet voulez vous équiper ? : ");
+		System.out.print("Quel objet voulez vous équiper ? : ");
 		String itemName = scan.nextLine();
-		for (Weapon weapon : joueur.getInventaire().getWeapons()) {
-			if (itemName.contains(weapon.getNom())) {
-				joueur.equiperItem(weapon);
+		for (Weapon weapon : player.getInventory().getWeapons()) {
+			if (itemName.contains(weapon.getName())) {
+				player.equipItem(weapon);
 				return;
 			}
 		}
-		for (Artefact artefact : joueur.getInventaire().getArtefacts()) {
-			if (itemName.contains(artefact.getNom())) {
-				joueur.equiperItem(artefact);
+		for (Artefact artefact : player.getInventory().getArtefacts()) {
+			if (itemName.contains(artefact.getName())) {
+				player.equipItem(artefact);
 				return;
 			}
 		}
-		System.out.print("\nVous ne possedait pas cet objet.");
+		System.out.println("Vous ne possedait pas cet objet.");
 	}
 	
-	static void seDeplacer(Scanner scan) {
-		System.out.print("Quel direction ? (z-q-s-d) : ");
+	private void usePotion(Scanner scan) {
+		System.out.print("Quelle potion voulez vous utiliser ? : ");
+		String itemName = scan.nextLine();
+		for (Potion potion : player.getInventory().getPotions()) {
+			if (itemName.contains(potion.getName())) {
+				potion.use(player);
+				player.getInventory().removeItem(potion);
+				return;
+			}
+		}
+	}
+	
+	static void move(Scanner scan) {
+		System.out.print("Quelle direction ? (z-q-s-d) : ");
 		char direction = scan.nextLine().charAt(0);
 		switch (direction) {
 		case 'z':
-			if (donjon.caseAtteignable(joueur.getPosition().getX(), joueur.getPosition().getY()-1)) joueur.seDeplacer(direction);
+			if (dungeon.caseAtteignable(player.getPosition().getX(), player.getPosition().getY()-1)) player.move(direction);
 				break;
 		case 'q':
-			if (donjon.caseAtteignable(joueur.getPosition().getX()-1, joueur.getPosition().getY())) joueur.seDeplacer(direction);
+			if (dungeon.caseAtteignable(player.getPosition().getX()-1, player.getPosition().getY())) player.move(direction);
 				break;
 		case 's':
-			if (donjon.caseAtteignable(joueur.getPosition().getX(), joueur.getPosition().getY()+1)) joueur.seDeplacer(direction);
+			if (dungeon.caseAtteignable(player.getPosition().getX(), player.getPosition().getY()+1)) player.move(direction);
 				break;
 		case 'd':
-			if (donjon.caseAtteignable(joueur.getPosition().getX()+1, joueur.getPosition().getY())) joueur.seDeplacer(direction);
+			if (dungeon.caseAtteignable(player.getPosition().getX()+1, player.getPosition().getY())) player.move(direction);
 				break;
 		}
+	}
+	
+	public void drawDelimitater() {;
+		for (int i = 0; i < 75; i++) {
+			System.out.print("-");
+		}
+		System.out.print("\n");
 	}
 }
